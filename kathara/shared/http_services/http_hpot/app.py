@@ -13,7 +13,7 @@ def home():
 def about():
     return render_template("about.html")
 
-@app.route("/admin", methods = ["GET", "POST"])
+@app.route("/login", methods = ["GET", "POST"])
 def login():
     if request.method == "POST":
         username = request.form.get("username")
