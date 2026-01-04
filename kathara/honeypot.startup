@@ -9,7 +9,3 @@ ip route add default via "$GATEWAY"
 
 # Initialization
 /shared/scripts/init.sh
-
-# Start HTTP service
-cd /shared/scripts/services/hpot_http/
-python3 -m http.server 8080 &
