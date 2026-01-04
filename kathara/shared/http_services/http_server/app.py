@@ -13,7 +13,7 @@ def home():
 def about():
     return render_template("about.html")
 
-@app.route("/admin", methods=["GET", "POST"])
+@app.route("/admin", methods = ["GET", "POST"])
 def login():
     if request.method == "POST":
         username = request.form.get("username")
@@ -43,4 +43,4 @@ def logout():
     return redirect(url_for("home"))
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug = True, host = "0.0.0.0", port = 8080)
