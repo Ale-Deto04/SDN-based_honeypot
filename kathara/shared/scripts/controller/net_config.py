@@ -12,5 +12,17 @@ NET_CONFIG = {
         'virtual_mac': '00:00:de:ad:be:ef',
 }
 
-ASSETS_URL = ['admin']
 SERVICE_PORT = 8080
+
+PATTERNS = [
+    ["/login/dashboard"],
+    ["POST", "/login"]
+]
+
+def match_patterns(payload: str):
+    payload = payload.lower()
+    matched = []
+    for pattern_list in PATTERNS:
+        if all(p.lower() in payload for p in pattern_list):
+            matched.append(pattern_list)
+    return matched

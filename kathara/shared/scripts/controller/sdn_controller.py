@@ -1,17 +1,3 @@
-# Copyright (C) 2011 Nippon Telegraph and Telephone Corporation.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-# implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 import ryu.ofproto.ofproto_v1_3_parser
 import ipaddress
 import logging
@@ -28,8 +14,8 @@ from ryu.lib.packet import arp
 from ryu.lib.packet import tcp
 from ryu.lib.packet import in_proto
 from net_config import NET_CONFIG
-from net_config import ASSETS_URL
 from net_config import SERVICE_PORT
+from net_config import match_patterns
 
 logging.basicConfig(
     level = logging.INFO,
@@ -264,54 +250,52 @@ class SimpleSwitch13(app_manager.RyuApp):
                             # Decode higher level payload
                             payload = pkt.protocols[-1].decode("utf-8", errors="ignore")
 
-                            for item in ASSETS_URL:
-                                if item in payload:
-                                    logging.warning("===> INTRUSION: un-trusted device asking for %s", item)
+                            pattern = match_patterns(payload)
+                            if pattern:
+                                logging.warning("===> INTRUSION: un-trusted device asking for %s", pattern)
 
-                                    if self.HPOT_READY:
-                                        dst = self.HPOT_IP
-                                        out_port = self.HPOT_PORT
-                                        install_flow = True
-                                        on_routing = True
+                                if self.HPOT_READY:
+                                    dst = self.HPOT_IP
+                                    out_port = self.HPOT_PORT
+                                    install_flow = True
+                                    on_routing = True
 
-                                        # Add reverse NAT flow
-                                        match = parser.OFPMatch(eth_type = ether_types.ETH_TYPE_IP, ipv4_dst = ip_pkt.src, ipv4_src = self.HPOT_IP)
-                                        actions = [
-                                            parser.OFPActionSetField(eth_src = self.SWITCH_VIRTUAL_MAC),
-                                            parser.OFPActionSetField(eth_dst = eth.src),
-                                            parser.OFPActionSetField(ipv4_src = self.SERVER_IP),
-                                            parser.OFPActionDecNwTtl(),
-                                            parser.OFPActionOutput(in_port)]
+                                    # Add reverse NAT flow
+                                    match = parser.OFPMatch(eth_type = ether_types.ETH_TYPE_IP, ipv4_dst = ip_pkt.src, ipv4_src = self.HPOT_IP)
+                                    actions = [
+                                        parser.OFPActionSetField(eth_src = self.SWITCH_VIRTUAL_MAC),
+                                        parser.OFPActionSetField(eth_dst = eth.src),
+                                        parser.OFPActionSetField(ipv4_src = self.SERVER_IP),
+                                        parser.OFPActionDecNwTtl(),
+                                        parser.OFPActionOutput(in_port)]
 
-                                        logging.info("===> Add Reverse-NAT flow to reach %s (port %s)", eth.src[-5:], in_port)
-                                        if msg.buffer_id != ofproto.OFP_NO_BUFFER:
-                                            self.add_flow(datapath, 1, match, actions, msg.buffer_id)
-                                            return
-                                        else:
-                                            self.add_flow(datapath, 1, match, actions)
-
-                                        # Drop RST
-                                        logging.info("===> Drop RST Message")
-                                        match = parser.OFPMatch(eth_type = ether_types.ETH_TYPE_IP, 
-                                                                ipv4_dst = ip_pkt.src, 
-                                                                ipv4_src = ip.pkt.dst,
-                                                                ip_proto = in_proto.IPPROTO_TCP,
-                                                                tcp_flags = 0x04)
-                                        actions = []
-                                        if msg.buffer_id != ofproto.OFP_NO_BUFFER:
-                                            self.add_flow(datapath, 1, match, actions, msg.buffer_id)
-                                            return
-                                        else:
-                                            self.add_flow(datapath, 1, match, actions)
-
-                                    else:
-                                        logging.error("===> Honeypot is unreachable")
+                                    logging.info("===> Add Reverse-NAT flow to reach %s (port %s)", eth.src[-5:], in_port)
+                                    if msg.buffer_id != ofproto.OFP_NO_BUFFER:
+                                        self.add_flow(datapath, 1, match, actions, msg.buffer_id)
                                         return
+                                    else:
+                                        self.add_flow(datapath, 1, match, actions)
+                                    
+                                    # Drop RST
+                                    logging.info("===> Drop RST Message")
+                                    match = parser.OFPMatch(eth_type = ether_types.ETH_TYPE_IP, 
+                                                            ipv4_dst = ip_pkt.src, 
+                                                            ipv4_src = ip.pkt.dst,
+                                                            ip_proto = in_proto.IPPROTO_TCP,
+                                                            tcp_flags = 0x04)
+                                    actions = []
+                                    if msg.buffer_id != ofproto.OFP_NO_BUFFER:
+                                        self.add_flow(datapath, 1, match, actions, msg.buffer_id)
+                                        return
+                                    else:
+                                        self.add_flow(datapath, 1, match, actions)
 
+                                else:
+                                    logging.error("===> Honeypot is unreachable")
+                                    return
                         except:
                                 pass
-
-
+            
             # Determine target MAC address
             dst_mac = self.ip_to_mac[dpid].get(dst)
 
