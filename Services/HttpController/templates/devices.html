@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>HoneyMoon Inc. Controller</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <style>
+      body,
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-family: "Montserrat", sans-serif
+      }
+
+      .w3-row-padding img {
+        margin-bottom: 12px
+      }
+
+      .w3-sidebar {
+        width: 120px;
+        background: #222;
+      }
+
+      #main {
+        margin-left: 120px
+      }
+
+      @media only screen and (max-width: 600px) {
+        #main {
+          margin-left: 0
+        }
+      }
+
+      #nav-info-badge {
+        display: none;        
+        position: absolute;
+        top: 4px;
+        right: 12px;
+
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        border: 3px solid white;
+
+        background-color: #2196F3; 
+        color: white;
+        font-size: 18px;
+        font-weight: 900;
+        line-height: 22px;
+        text-align: center;
+        box-shadow: 0 0 6px rgba(0,0,0,0.4);
+      }
+
+      .monitoring-alert {
+        animation: blink-border 1s infinite alternate; 
+        border-left: 6px solid #ff9800 !important; 
+        background-color: #fff3e0 !important;
+      }
+
+      @keyframes blink-border {
+        from { box-shadow: 0 0 5px red; border-color: red; }
+        to { box-shadow: 0 0 15px orange; border-color: orange; }
+      }
+    </style>
+  </head>
+  <body class="w3-white">
+
+    <!-- Navbar -->
+    <nav class="w3-sidebar w3-bar-block w3-small w3-hide-small w3-center w3-white">
+      <img src="{{ url_for('static', filename='images/logo.png') }}" style="width:100%">
+      <a href="{{ url_for('home') }}" class="w3-bar-item w3-button w3-padding-large w3-hover-light-grey">
+        <i class="fa fa-signal w3-xxlarge"></i>
+        <p>HOME</p>
+      </a>
+      <a href="{{ url_for('terminal') }}" class="w3-bar-item w3-button w3-padding-large w3-hover-light-grey" style="position: relative;">
+        <span id="nav-info-badge" class="w3-red">!</span>
+        <i class="fa fa-terminal w3-xxlarge"></i>
+        <p>CONSOLE</p>
+      </a>
+      <a href="{{ url_for('devicesList') }}" class="w3-bar-item w3-button w3-padding-large w3-hover-light-grey" style="position: relative;">
+        <i class="fa fa-laptop w3-xxlarge"></i>
+        <p>DEVICES</p>
+      </a>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="w3-padding-large" id="main">
+
+      <header class="w3-container w3-padding-32 w3-center w3-white">
+        <img src="{{ url_for('static', filename='images/full_logo.png') }}" class="w3-image">
+      </header>
+
+      <div id="device-list" class="w3-content w3-text-grey w3-padding-64" style="max-width:800px">
+
+        {% for host in devices %} 
+        <div id="{{ host['ip'] }}" class="w3-card w3-container w3-white w3-padding-24 w3-margin-bottom w3-leftbar 
+          {% if host['trusted'] %} w3-border-green 
+          {% elif host['monitoring'] %} w3-border-red monitoring-alert
+          {% else %} w3-border-red
+          {% endif %}">
+          <div class="w3-row">
+            <div class="w3-col s3 w3-center">
+              <i class="fa 
+                {% if host['name'] == 'Server' %} fa-server
+                {% elif host['name'] == 'HoneyPot' %} fa-user-secret
+                {% else %} fa-desktop {% endif %}
+                w3-xxlarge">
+              </i>
+            </div>
+            <div class="w3-col s9">
+              <h4 class="w3-margin-bottom">
+              {% if host['monitoring'] %}
+              <i class="fa fa-eye"></i> Monitoring 
+              {% endif %}
+              {{ host["name"] }}</h4>
+              <p>
+                <i class="fa fa-circle 
+                  {% if host['trusted'] %} w3-text-green {% else %} w3-text-red {% endif %}">
+                </i>
+                <b> {% if host["trusted"] %} Trusted {% else %} Untrusted {% endif %} </b>
+              </p>
+              <p class="w3-opacity">
+                <b>IP:</b> {{ host["ip"] }}
+              </p>
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <p id="error-message" class="w3-opacity w3-center">No device detected, make sure the controller is online</p>
+        {% endfor %}
+
+      </div> 
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+          if (sessionStorage.getItem("infoAlert") === "true") {
+            const badge = document.getElementById("nav-info-badge");
+            if (badge) {
+              badge.style.display = "block";
+            }
+          }
+          sessionStorage.removeItem("deviceAlert");
+      });
+
+      const socket = io();
+
+      function addDevice(host) {
+
+        const hostList = document.getElementById("device-list");
+
+        const message = document.getElementById("error-message");
+        if (message) {
+          message.remove();
+        }
+
+        const card = document.createElement("div");
+
+        card.id = host.ip;
+
+        card.className = `w3-card w3-container w3-white w3-padding-24 w3-margin-bottom
+            ${host.trusted ? 'w3-leftbar w3-border-green' : 'w3-leftbar w3-border-red'}`;
+
+        let icon = "fa-desktop";
+        if (host.name === "Server") icon = "fa-server";
+        if (host.name === "HoneyPot") icon = "fa-user-secret";
+
+        card.innerHTML = `
+            <div class="w3-row">
+            <div class="w3-col s3 w3-center">
+              <i class="fa ${icon} w3-xxlarge"></i>
+            </div>
+            <div class="w3-col s9">
+              <h4 class="w3-margin-bottom">${host.name}</h4>
+              <p>
+                <i class="fa fa-circle ${host.trusted ? 'w3-text-green' : 'w3-text-red'}"></i>
+                <b>${host.trusted ? 'Trusted' : 'Untrusted'}</b>
+              </p>
+              <p class="w3-opacity">
+                <b>IP:</b> ${host.ip}
+              </p>
+            </div>
+          </div>
+        `;
+
+        hostList.append(card);
+      }
+
+      socket.on("new_host", (data) => {
+        addDevice(data)
+      });
+
+      socket.on("monitoring", (data) => {
+        const target = document.getElementById(data.ip);
+        if (target) {
+          target.classList.add("monitoring-alert");
+          const title = target.querySelector("h4");
+          const hostName = title.dataset.originalName || title.textContent;
+          title.dataset.originalName = hostName;
+          title.innerHTML = "<i class='fa fa-eye'></i> Monitoring " + hostName; 
+          target.scrollIntoView({behavior: 'smooth', block: 'center'})
+        }
+      });
+
+      socket.on("console_message", (data) => {
+        const badge = document.getElementById("nav-info-badge");
+        if (badge) {
+          if (badge.style.display !== "block") {
+            badge.style.display = "block";
+            sessionStorage.setItem("infoAlert", "true"); 
+          }  
+        }
+      });
+
+    </script>
+
+  </body>
+</html>

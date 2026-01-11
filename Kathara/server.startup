@@ -1,0 +1,15 @@
+# Server IP address
+ip addr add 10.0.0.1/24 dev eth0
+
+# Gateway
+export GATEWAY="10.0.0.254"
+
+# Default gateway
+ip route add default via "$GATEWAY"
+
+# Initialization
+/shared/scripts/init.sh
+
+# Service startup
+cd /app/HttpServer/
+python3 app.py > server.log 2>&1 &

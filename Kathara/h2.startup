@@ -1,0 +1,14 @@
+# Host 2 IP address
+ip addr add 10.0.2.1/24 dev eth0
+
+# Gateway
+export GATEWAY="10.0.2.254"
+
+# Default gateway
+ip route add 10.0.0.0/24 via "$GATEWAY"
+
+# Initialization
+/shared/scripts/init.sh
+
+# Local DNS
+echo "10.0.0.1 honeymoon.com honeymoon server" >> /etc/hosts

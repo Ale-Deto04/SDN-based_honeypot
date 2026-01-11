@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - HoneyMoon Inc.</title>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Admin Dashboard</h1>
+        <p>Welcome, {{ session['user'] }}! Here are some sensitive records:</p>
+
+        <ul>
+            <li>Name: John Doe      | Credit Card: 1111 1111 1111 1111</li>
+            <li>Name: Jane Smith    | Credit Card: 3333 3333 3333 3333</li>
+            <li>Name: Alice Johnson | Credit Card: 5555 5555 5555 5555</li>
+        </ul>
+
+        <a href="{{ url_for('logout') }}" class="logout">Logout</a>
+    </div>
+
+</body>
+</html>

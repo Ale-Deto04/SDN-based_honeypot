@@ -1,0 +1,20 @@
+# HoneyPot Server IP address
+ip addr add 11.0.0.1/24 dev eth0
+
+# Gateway
+export GATEWAY="11.0.0.254"
+
+# Default gateway
+ip route add default via "$GATEWAY"
+
+# Initialization
+/shared/scripts/init.sh
+
+# Start tcpflow for packet sniffing
+mkdir -p /flows
+tcpflow -i eth0 -o /flows &
+
+# Service startup
+cd /app/HttpHpot/
+python3 app.py > hpot.log 2>&1 &
+

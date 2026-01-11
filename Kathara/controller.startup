@@ -1,0 +1,9 @@
+# ControllerIP address
+ip addr add 20.0.0.1/24 dev eth0
+
+# Default gateway
+ip route add 10.0.0.0/24 via 10.0.1.254
+
+# Service startup
+cd /app/HttpController/
+python3 app.py > controller_service.log 2>&1 &

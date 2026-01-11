@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>HoneyMoon Inc. Controller</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <style>
+      body,
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-family: "Montserrat", sans-serif
+      }
+
+      #nav-alert-badge {
+        display: None;
+        position: absolute;
+        top: 4px;
+        right: 12px;
+
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        border: 3px solid white;
+
+        color: white;
+        font-size: 18px;
+        font-weight: 900;
+        line-height: 22px;
+        text-align: center;
+        box-shadow: 0 0 6px rgba(0,0,0,0.4);
+      }
+
+      .w3-row-padding img {
+        margin-bottom: 12px
+      }
+
+      .w3-sidebar {
+        width: 120px;
+        background: #222;
+      }
+
+      #main {
+        margin-left: 120px
+      }
+
+      @media only screen and (max-width: 600px) {
+        #main {
+          margin-left: 0
+        }
+      }
+
+      #console {
+        width: 80%;
+        height: 60vh;
+        margin: 20px auto;
+        background: #1e1e1e;
+        color: #dcdcdc;
+        padding: 15px;
+        overflow-y: auto;
+        font-family: "Courier New", Courier, monospace;
+        box-sizing: border-box;
+        border-radius: 10px;
+        border: 1px solid #333;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+      }
+
+      #console::-webkit-scrollbar {
+        width: 10px;
+      }
+
+      #console::-webkit-scrollbar-track {
+        background: #1e1e1e;
+      }
+
+      #console::-webkit-scrollbar-thumb {
+        background: #444;
+        border-radius: 5px;
+      }
+
+      #console::-webkit-scrollbar-thumb:hover {
+        background: #555;
+      }
+
+      .log-line {
+        margin-bottom: 4px;
+        line-height: 1.4;
+        word-wrap: break-word;
+      }
+
+      .prompt {
+        color: #00ff00;
+        font-weight: bold;
+        margin-right: 8px;
+      }
+    </style>
+  </head>
+  <body class="w3-white">
+    <!-- Icon Bar (Sidebar - hidden on small screens) -->
+    <nav class="w3-sidebar w3-bar-block w3-small w3-hide-small w3-center w3-white">
+      <!-- Avatar image in top left corner -->
+      <img src="{{ url_for('static', filename='images/logo.png') }}" style="width:100%">
+      <a href="{{ url_for('home') }}" class="w3-bar-item w3-button w3-padding-large w3-hover-light-grey">
+        <i class="fa fa-signal w3-xxlarge"></i>
+        <p>HOME</p>
+      </a>
+      <a href="{{ url_for('terminal') }}" class="w3-bar-item w3-button w3-padding-large w3-hover-light-grey" style="position: relative;">
+        <i class="fa fa-terminal w3-xxlarge"></i>
+        <p>CONSOLE</p>
+      </a>
+      <a href="{{ url_for('devicesList') }}" class="w3-bar-item w3-button w3-padding-large w3-hover-light-grey" style="position: relative;">
+        <i class="fa fa-laptop w3-xxlarge"></i>
+        <span id="nav-alert-badge" class="w3-red">!</span>
+        <p>DEVICES</p>
+      </a>
+    </nav>
+    
+    <div class="w3-padding-large" id="main">
+      <header class="w3-container w3-padding-32 w3-center w3-white">
+        <img src="{{ url_for('static', filename='images/full_logo.png') }}" class="w3-image">
+      </header>
+      <div id="console"> 
+        {% for record in log %}
+        <div class="log-line">
+          <span class="prompt">controller:~$</span>
+          <span class="message">{{ record["message"] }}</span>
+        </div>
+        {% endfor %}
+      </div>
+
+      <script>
+        document.addEventListener("DOMContentLoaded", () => {
+          sessionStorage.removeItem("infoAlert");
+
+          if (sessionStorage.getItem("deviceAlert") === "true") {
+            const badge = document.getElementById("nav-alert-badge");
+            if (badge) {
+              badge.style.display = "block";
+            }
+          }
+
+          const consoleDiv = document.getElementById("console");
+          consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        });
+
+        const socket = io();
+        const consoleDiv = document.getElementById("console");
+
+        function appendLog(data) {
+          const line = document.createElement("div");
+          line.classList.add("log-line");
+
+          const promptSpan = document.createElement("span");
+          promptSpan.classList.add("prompt");
+          promptSpan.textContent = "controller:~$";
+
+          const msgSpan = document.createElement("span");
+          msgSpan.classList.add("message");
+          msgSpan.textContent = data.message;
+
+          line.appendChild(promptSpan);
+          line.appendChild(msgSpan);
+          
+          consoleDiv.appendChild(line);
+          consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+
+        socket.on("console_message", (data) => {
+          appendLog(data)
+        });
+
+        socket.on("monitoring", (data) => {
+          const badge = document.getElementById("nav-alert-badge");
+          if (badge) {
+            if (badge.style.display !== "block") {
+              badge.style.display = "block";
+              sessionStorage.setItem("deviceAlert", "true"); 
+            }  
+          }
+        });
+      </script>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,2 @@
+# Removes "ready" file
+rm /shared/controller.ready

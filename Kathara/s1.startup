@@ -1,0 +1,21 @@
+# Switch IP address
+ip addr add 20.0.0.254/24 dev eth0
+
+# Start OVS services
+/usr/share/openvswitch/scripts/ovs-ctl --system-id=random start
+ovs-vsctl add-br s1
+
+# Blocks network if controller goes down
+ovs-vsctl set-fail-mode s1 secure
+
+# s1 ports
+ovs-vsctl add-port s1 eth1 # "lan"  (port 1)
+ovs-vsctl add-port s1 eth2 # "wan1" (port 2)
+ovs-vsctl add-port s1 eth3 # "wan2" (port 3)
+ovs-vsctl add-port s1 eth4 # "hpot" (port 4)
+
+# Set OpenFlow v.1.3
+ovs-vsctl set bridge s1 protocols=[OpenFlow13]
+
+# Controller IP (default port: 6653)
+ovs-vsctl set-controller s1 tcp:20.0.0.1
