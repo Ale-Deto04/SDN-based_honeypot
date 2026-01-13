@@ -198,7 +198,7 @@ Go to the **Home** page and click the green **Launch Controller** button.
 
 ![Dashboard](Images/dashboard.png)
 
-Once the controller starts, the **Console** and **Devices** sections will begin to populate, and the status on the **Home** page will switch to **ON**.  
+Once the controller starts, the **Console** and **Devices** sections will begin to populate, and the status of both the server and the honeypot shown in the **Home** page will switch to **ON**.  
 Wait until all the virtual machines are fully initialized.
 
 > [!WARNING]
