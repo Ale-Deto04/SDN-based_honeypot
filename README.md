@@ -170,7 +170,7 @@ Kathara will automatically deploy the virtual machines, opening **three terminal
 > Waiting startup commands execution. Press [ENTER] to override...
 > ```
 >
-> **DO NOT** override - this behaviour is completely normal as the virtual machines are watingn for the controller to start. You can proceed with the next steps.
+> **DO NOT** override - this behaviour is completely normal as the virtual machines are waiting for the controller to start. You can proceed with the next steps.
 
 
 > [!TIP]
