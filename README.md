@@ -270,7 +270,7 @@ This ensures that Client 2 remains unaware that it is communicating with the hon
 
 Meanwhile, the honeypot **records all communications** using `tcpflow`, allowing the captured traffic to be analyzed later for **security auditing**. To verify this, navigate to the `/flows` directory in the honeypot terminal, and inspect the captured traffic.
 
-On your terminal connect to the honeypot machine by typing:
+On your terminal connect to the honeypot by typing:
 ```bash
 kathara connect honeypot
 ```
@@ -278,6 +278,10 @@ Then navigate in the intended directory to list the captured payloads:
 ```bash
 cd /flows
 ls -l
+```
+
+Remember to exit the honeypot terminal to return to your machine's terminal.
+```bash
 exit
 ```
 
