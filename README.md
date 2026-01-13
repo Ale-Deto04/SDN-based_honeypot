@@ -265,6 +265,9 @@ cd /flows
 ls -l
 ```
 
+> [!NOTE]
+> The **simulated connection loss** is a design choice. In practice, it is **not possible to transparently switch an active TCP connection** from one host to another, because TCP maintains state information such as sequence numbers and session data. > 
+> By simulating a simple connection drop, the client can establish a new connection with the honeypot without raising suspicion. This approach allows the controller to redirect traffic safely while maintaining the illusion of a continuous session.
 ---
 
 ## Technologies involved
