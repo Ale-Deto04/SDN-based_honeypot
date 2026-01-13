@@ -196,6 +196,8 @@ Open your browser and navigate to the **controller dashboard** by typing the URL
 At first, the dashboard may appear mostly empty. This is because the SDN controller is not running yet.  
 Go to the **Home** page and click the green **Launch Controller** button.
 
+![Dashboard](Images/dashboard.png)
+
 Once the controller starts, the **Console** and **Devices** sections will begin to populate, and the status on the **Home** page will switch to **ON**.  
 Wait until all the virtual machines are fully initialized.
 
@@ -243,6 +245,8 @@ For simplicity, the web service is minimal, providing an About page and a login 
 
 Navigate to login page and submit the credentials `admin:admin`. Since Client 1 belongs to a **trusted subnet**, it can succesfully access the `/login/dashboard` page and read the **sensitive informations**.
 
+![h1](Images/h1.png)
+
 
 ### Threat detection
 
@@ -252,6 +256,7 @@ When you try to log in as admin or directly access `/login/dashboard`, the serve
 
 If you then retry to ping the server or access the sensitive web service using leaked credentials, you will notice that you can **reach the admin dashboard**; however, the **content will be different**, as it is served by the honeypot.
 
+![h2](Images/h2.png)
 
 ### Technical Overview
 
