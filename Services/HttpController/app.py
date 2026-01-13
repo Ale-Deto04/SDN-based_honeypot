@@ -3,6 +3,7 @@ import subprocess
 import ipaddress
 from flask import Flask, request, jsonify, render_template, redirect, url_for, abort
 from flask_socketio import SocketIO
+from NETCONFIG import PATTERNS, CONFIG
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins = "*")
@@ -17,7 +18,9 @@ MAX_HISTORY = 50
 log = []
 
 devices = []
+patterns = PATTERNS
 
+PATTERNS_REGEX = r"\[[^\[\]]*\]"
 IPV4_REGEX = r"\b(?:(?:25[0-5]|2[0-4]\d|1?\d{1,2})\.){3}(?:25[0-5]|2[0-4]\d|1?\d{1,2})\b"
 
 PATH_TO_CONTROLLER = "/shared/controllerSDN/controller.py"
@@ -62,7 +65,7 @@ def terminal():
 
 @app.route("/devices", methods = ["GET"])
 def devicesList():
-	return render_template("devices.html", devices = devices)
+	return render_template("devices.html", devices = devices, patterns = PATTERNS, net_config = CONFIG)
 
 @app.route("/init", methods = ["GET"])
 def init():
