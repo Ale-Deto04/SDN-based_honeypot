@@ -14,6 +14,7 @@ Thanks to packet manipulation at the network layer, the malicious host remains *
 
 ## Project description
 The project consists of an active laboratory environment in which the network of a fictitious company, called _HoneyMoon INC_, is deployed using Kathará. Clients can interact with the infrastructure by accessing services hosted within the network.
+
 The architecture follows a **client–server** model, with traffic fully managed by an SDN-enabled switch under the control of a centralized controller.
 
 ### Network Topology
@@ -63,7 +64,7 @@ Hosts belonging to trusted networks are allowed to access such resources, wherea
 ### SDN Control Logic
 
 All packets flow through the SDN switch which operates under the control of the `Ryu` controller, acting as the **logical brain** of the network. The controller
-1. Handles **incoming packets** (`PACKET-IN`) according to SDN principles
+1. Handles **incoming packets** (`PACKET_IN`) according to SDN principles
 2. Implements **routing functions** for inter-network communication
 3. Installs **flow rules** on the switch using `FLOW_MOD` messages for subsequent packets.
 
