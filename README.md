@@ -237,14 +237,33 @@ You should be redirected to the **server's home page**. You can navigate using t
 
 For simplicity, the web service is minimal, providing an About page and a login form for the admin dashboard.
 
-Navigate to login page and submit the credentials `admin:admin`. Since Client 1 belongs to a **trusted subnet**, it can succesfully **access the sensitive informations**.
+Navigate to login page and submit the credentials `admin:admin`. Since Client 1 belongs to a **trusted subnet**, it can succesfully access the `/login/dashboard` page and read the **sensitive informations**.
 
 
 ### Threat detection
 
-On `h2` perform the same steps of Client 1. You can visit the web server as Client 1.
+On `h2` perform the same steps of Client 1 to visit the web server.
 
-When you try to login 
+When you try to log in as admin or directly access `/login/dashboard`, the server will not respond, simulating a **connection loss**. On the controller dashboard, an alert badge will appear, indicating that an **untrusted device** is attempting to access private information.
+
+If you then retry to ping the server or access the sensitive web service using leaked credentials, you will notice that you can **reach the admin dashboard**; however, the **content will be different**, as it is served by the honeypot.
+
+
+### Technical Overview
+
+As shown in the Console, the controller continuously **monitors the activity of Client 2** during all communications. Whenever a TCP packet is detected, the controller performs **Deep Packet Inspection** (**DPI**) to determine whether the client is attempting any malicious activity. In this project, the controller looks for the strings `["POST", "/login"]` or `/login/dashboard` in the HTTP request payload, which indicate an access attempt to restricted resources.
+
+If malicious activity is detected, the controller **drops the packet** and installs a rule in the switch flow table to **rewrite the IP headers** of packets between Client 2 and the server in such a way that:
+- The **destination IP** of packets from Client 2 originally intended for the server is replaced with the **honeypot IP**
+- The **source IP** of packets from the honeypot destined to Client 2 is replaced with the **server IP**
+
+This ensures that Client 2 remains unaware that it is communicating with the honeypot, as the IPs are modified midway by the switch.
+
+Meanwhile, the honeypot **records all communications** using `tcpflow`, allowing the captured traffic to be analyzed later for **security auditing**. To verify this, open the honeypot terminal, navigate to the `/flows` directory, and inspect the captured traffic.
+```bash
+cd /flows
+ls -l
+```
 
 ---
 
