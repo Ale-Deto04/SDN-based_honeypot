@@ -87,7 +87,7 @@ This redirection is achieved by installing flow rules on the switch that dynamic
 This repository is organized as follows:
 
 ```bash
-main
+SDN-Based_Honeypot
 ├── build.sh
 ├── Dockerfiles
 │   ├── Dockerfile.host
