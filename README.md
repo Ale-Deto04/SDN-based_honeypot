@@ -87,14 +87,14 @@ This redirection is achieved by installing flow rules on the switch that dynamic
 This repository is organized as follows:
 
 ```bash
-SDN-Based_Honeypot
+SDN-Based_Honeypot/
 ├── build.sh
-├── Dockerfiles
+├── Dockerfiles/
 │   ├── Dockerfile.host
 │   ├── Dockerfile.ryu
 │   └── Dockerfile.server
 ├── Images/
-├── Kathara
+├── Kathara/
 │   ├── controller.shutdown
 │   ├── controller.startup
 │   ├── h1.startup
@@ -103,26 +103,26 @@ SDN-Based_Honeypot
 │   ├── lab.conf
 │   ├── s1.startup
 │   ├── server.startup
-│   └── shared
-│       ├── controllerSDN
+│   └── shared/
+│       ├── controllerSDN/
 │       │   ├── controller.py
 │       │   ├── customLogger.py
 │       │   └── NETCONFIG.py      
-│       └── scripts
+│       └── scripts/
 │           └── init.sh
 ├── LICENSE
 ├── README.md
-└── Services
-    ├── HttpController
+└── Services/
+    ├── HttpController/
     │   ├── app.py
-    │   ├── static
-    │   └── templates
-    ├── HttpHpot
+    │   ├── static/
+    │   └── templates/
+    ├── HttpHpot/
     │   ├── app.py
-    │   └── templates
-    └── HttpServer
+    │   └── templates/
+    └── HttpServer/
         ├── app.py
-        └── templates
+        └── templates/
 ```
 
 - `/Dockerfiles`: contains the container images for the controller, servers, and hosts
