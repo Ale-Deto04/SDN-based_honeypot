@@ -255,7 +255,7 @@ On `h2`, perform the same steps of Client 1 to visit the web server.
 
 When you try to log in as admin or directly access `/login/dashboard`, the server will not respond, simulating a **connection loss**. On the controller dashboard, an alert badge will appear, indicating that an **untrusted device** is attempting to access private information.
 
-If you then retry to ping the server or access the sensitive information by pressing `SHIFT+R` to refresh the page or `SHIFT+B` to return to the login page and re-enter the leaked credentials, you will notice that you can **reach the admin dashboard**; however, the **content will be different**, as it is served by the honeypot.
+If you then retry to ping the server or access the sensitive information by pressing `SHIFT+B` to return to the login page and re-enter the leaked credentials, you will notice that you can **reach the admin dashboard**; however, the **content will be different**, as it is served by the honeypot.
 
 ![h2](Images/h2.png)
 
