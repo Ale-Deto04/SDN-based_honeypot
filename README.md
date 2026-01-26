@@ -128,11 +128,11 @@ SDN-Based_Honeypot/
 
 ### Main folders
 
-- `/Dockerfiles/`: contains the container images for the controller, servers, and hosts
-- `/Kathara/`: contains the Kathará configuration files and the shared scripts
-- `/Kathara/shared/`: contains the `init.sh` script for device initialization and the Python code for the Ryu controller
-- `/Services/`: contains the HTTP services deployed on each virtual machine
-- `/Docs/`: contains the project presentation
+- `Dockerfiles/`: contains the container images for the controller, servers, and hosts
+- `Kathara/`: contains the Kathará configuration files and the shared scripts
+- `Kathara/shared/`: contains the `init.sh` script for device initialization and the Python code for the Ryu controller
+- `Services/`: contains the HTTP services deployed on each virtual machine
+- `Docs/`: contains the project presentations
 
 ---
 
